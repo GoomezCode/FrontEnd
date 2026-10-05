@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste</title>
+</head>
+
+<style>
+
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+fieldset{
+    padding: 10px;
+    border-radius: 10px;
+}
+fieldset legend{
+    font-weight: bold;
+}
+button{
+    display: flex;
+    margin: 10px auto 0px auto;
+
+    padding: 3px 30px;
+    font-weight: bold;
+    border-radius: 5px;
+    border: solid black 1px;
+}
+
+</style>
+
+<body>
+    <form id="form">
+        <fieldset>
+            <legend>Dados User</legend>
+            <label for="input-name">Digite seu Nome:</label>
+            <input type="text" id="input-name">
+            <br>
+            <button type="submit" onclick="ativar()">Enviar Dados!</button>
+            <p id="msg"></p>
+        </fieldset>
+    </form>    
+    
+
+<script src="script01.js"></script>
+</body>
+</html>
