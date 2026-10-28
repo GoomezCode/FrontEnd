@@ -1,0 +1,68 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+
+    border: solid 2px black;
+    border-radius: 5px;
+    padding: 5px;
+}
+.campos{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.campos > fieldset{
+    display: flex;
+    flex-direction: column;
+    border: solid 2px black;
+    border-radius: 5px;
+    padding: 5px;
+}
+.campos > fieldset > legend{
+    font-weight: bold;
+}
+
+.campos > fieldset > input{
+    font-size: 20px;
+    border: solid 2px black;
+    border-radius: 5px;
+    padding: 2px;
+    margin-bottom: 10px;
+}
+.campos > fieldset > label{
+    font-size: 20px;
+}
+
+
+button{
+    font-size: 20px;
+    font-weight: bold;
+    
+    border: solid 2px black;
+    border-radius: 5px;
+    background-color: white;
+    cursor: pointer;
+    width: 50%;
+    margin: 0px auto 0px auto;
+
+    margin-top: 10px;
+}
+button:active{
+    transform: scale(1.1);
+}

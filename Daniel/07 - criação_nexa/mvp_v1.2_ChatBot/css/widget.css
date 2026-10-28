@@ -1,0 +1,387 @@
+/* ---------- ChatBot flutuante ---------- */
+/* Reaproveita os tokens de tema e as classes .btn/.icon-btn/.msg/.markdown
+   já definidas em components.css; aqui ficam só o launcher e o painel. */
+
+.bot {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.bot-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(380px, calc(100vw - 36px));
+  height: min(560px, calc(100vh - 120px));
+  height: min(560px, calc(100dvh - 120px));
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transform-origin: bottom right;
+  animation: bot-in 0.18s ease both;
+}
+
+@keyframes bot-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Cabeçalho ---------- */
+.bot-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 10px 11px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.bot-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.bot-brand__mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 15px;
+}
+
+.bot-brand__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.bot-brand__text strong {
+  font-size: 13.5px;
+}
+
+.bot-brand__text span {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bot-head__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.bot-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.bot-status__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.bot-status[data-state="online"] .bot-status__dot {
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15);
+}
+
+.bot-status[data-state="offline"] .bot-status__dot {
+  background: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+
+.bot-status[data-state="checking"] .bot-status__dot {
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+/* ---------- Área de mensagens ---------- */
+.bot-body {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.bot-messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 14px 8px;
+  overscroll-behavior: contain;
+}
+
+.bot-messages .msg {
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.bot-messages .msg__avatar {
+  width: 26px;
+  height: 26px;
+  font-size: 9px;
+}
+
+.bot-messages .msg--assistant .msg__avatar {
+  font-size: 12px;
+}
+
+.bot-messages .msg__content {
+  font-size: 13.5px;
+}
+
+.bot-messages .msg__meta {
+  font-size: 10.5px;
+}
+
+.bot-messages .msg--user .msg__body {
+  max-width: 86%;
+}
+
+.bot-messages .msg--user .msg__content {
+  padding: 8px 12px;
+  border-radius: 12px 12px 4px 12px;
+}
+
+/* ---------- Estado vazio ---------- */
+.bot-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 20px 18px;
+  text-align: center;
+}
+
+.bot-empty__mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--accent-soft);
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 20px;
+}
+
+.bot-empty__greeting {
+  max-width: 30ch;
+  color: var(--text-soft);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.bot-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.bot-suggestions .suggestion {
+  padding: 8px 11px;
+  font-size: 12px;
+  text-align: left;
+}
+
+/* ---------- Aviso de conexão ---------- */
+.bot-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 12px 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  border-radius: 10px;
+  background: rgba(251, 191, 36, 0.08);
+  color: var(--text-soft);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.bot-banner code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.bot-banner .btn {
+  flex: 0 0 auto;
+}
+
+/* ---------- Composer ---------- */
+.bot-composer {
+  padding: 10px 12px 8px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.bot-composer .composer {
+  position: relative;
+  margin: 0;
+  padding: 8px 46px 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+}
+
+.bot-composer .composer:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.bot-composer .composer textarea {
+  font-size: 13.5px;
+  max-height: 96px;
+}
+
+.bot-composer .composer textarea:focus-visible {
+  box-shadow: none;
+}
+
+/* Botão de enviar ancorado à direita, para o campo ficar compacto. */
+.bot-composer .composer__foot {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  margin: 0;
+}
+
+.bot-composer .composer__hint {
+  display: none;
+}
+
+/* ---------- Launcher ---------- */
+.bot-launcher {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.bot-launcher:hover {
+  filter: brightness(1.06);
+  transform: translateY(-2px);
+}
+
+.bot-launcher:active {
+  transform: translateY(0);
+}
+
+.bot-launcher:focus-visible {
+  outline: none;
+  box-shadow: var(--ring), var(--shadow);
+}
+
+.bot-launcher__icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.bot-launcher__badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--bg);
+  border-radius: 50%;
+  background: var(--danger);
+}
+
+/* ---------- Convivência com os toasts ---------- */
+.toasts {
+  bottom: 86px;
+}
+
+.bot.is-open ~ .toasts {
+  top: 18px;
+  bottom: auto;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 560px) {
+  .bot {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  /* Painel em tela cheia, como um app de mensagens. */
+  .bot-panel {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    border: 0;
+    border-radius: 0;
+  }
+
+  .bot.is-open .bot-launcher {
+    display: none;
+  }
+
+  .bot-composer .composer__foot {
+    justify-content: flex-end;
+  }
+
+  body.bot-open {
+    overflow: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bot-panel {
+    animation: none;
+  }
+
+  .bot-launcher {
+    transition: none;
+  }
+}

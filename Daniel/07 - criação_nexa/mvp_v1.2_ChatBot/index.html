@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Nexa: interface web de chat com IA local via Ollama, com streaming, histórico e Markdown.">
+  <title>Nexa · Chat de IA</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b1118'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle' fill='%233ecbf5'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/widget.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Conversas">
+      <header class="sidebar__head">
+        <div class="brand">
+          <span class="brand__mark" aria-hidden="true">✦</span>
+          <div class="brand__text">
+            <strong>Nexa</strong>
+            <span>IA local · Ollama</span>
+          </div>
+        </div>
+        <button class="icon-btn only-mobile" id="btn-close-sidebar" type="button" aria-label="Fechar menu">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </header>
+
+      <button class="btn btn--primary btn--block" id="btn-new-chat" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Nova conversa
+      </button>
+
+      <div class="search">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search" type="search" placeholder="Buscar conversas" aria-label="Buscar conversas" autocomplete="off">
+      </div>
+
+      <nav class="conv-list" id="conversation-list" aria-label="Histórico de conversas"></nav>
+
+      <footer class="sidebar__foot">
+        <div class="field">
+          <label class="field__label" for="ollama-url">Servidor Ollama</label>
+          <div class="field__row">
+            <input class="input" id="ollama-url" type="text" inputmode="url" spellcheck="false" autocomplete="off" placeholder="http://192.168.0.10:11434" aria-label="URL do servidor Ollama">
+            <button class="icon-btn icon-btn--boxed" id="btn-apply-url" type="button" aria-label="Aplicar servidor" title="Aplicar e testar conexão">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+          </div>
+          <div class="presets" id="ollama-presets" role="group" aria-label="Atalhos de conexão">
+            <button class="chip" type="button" data-preset="network">Rede</button>
+            <button class="chip" type="button" data-preset="local">Localhost</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="model-select">Modelo</label>
+          <div class="field__row">
+            <select id="model-select" class="select" aria-label="Modelo de IA"></select>
+            <button class="icon-btn icon-btn--boxed" id="btn-refresh-models" type="button" aria-label="Atualizar modelos" title="Atualizar modelos">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="status" id="ollama-status" data-state="checking">
+          <span class="status__dot" aria-hidden="true"></span>
+          <span class="status__text">Verificando Ollama…</span>
+        </div>
+
+        <button class="btn btn--ghost btn--block" id="btn-theme" type="button">
+          <span class="theme-icon" id="theme-icon" aria-hidden="true"></span>
+          <span id="theme-label">Mudar para tema claro</span>
+        </button>
+      </footer>
+    </aside>
+
+    <div class="backdrop" id="backdrop" hidden></div>
+
+    <main class="main">
+      <header class="chat-header">
+        <button class="icon-btn only-mobile" id="btn-open-sidebar" type="button" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <div class="chat-header__info">
+          <h1 id="conversation-title">Nova conversa</h1>
+          <p id="conversation-meta">llama3.2</p>
+        </div>
+        <button class="icon-btn" id="btn-clear" type="button" aria-label="Limpar mensagens" title="Limpar mensagens">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+        </button>
+      </header>
+
+      <div class="chat-body">
+        <section class="messages" id="messages" aria-label="Mensagens"></section>
+
+        <div class="empty" id="empty-state">
+          <div class="orb" aria-hidden="true"><span></span></div>
+          <h2>Como posso ajudar?</h2>
+          <p>Pergunte qualquer coisa. A resposta é gerada localmente pelo Ollama e aparece em tempo real.</p>
+          <div class="suggestions" id="suggestions">
+            <button class="suggestion" type="button" data-prompt="Explique o que é SSE como se eu tivesse 12 anos.">Explique SSE de forma simples</button>
+            <button class="suggestion" type="button" data-prompt="Escreva uma função em JavaScript que valida um e-mail.">Validar e-mail em JS</button>
+            <button class="suggestion" type="button" data-prompt="Compare FastAPI e Flask em uma tabela.">FastAPI x Flask</button>
+            <button class="suggestion" type="button" data-prompt="Monte um plano de estudos de 30 dias para aprender Python do zero.">Plano de estudos de Python</button>
+          </div>
+        </div>
+      </div>
+
+      <footer class="composer-wrap">
+        <div class="banner" id="offline-banner" role="status" hidden>
+          <div>
+            <p><strong>Ollama offline.</strong> Não foi possível conectar a <code id="offline-url">http://localhost:11434</code>. Inicie com <code>ollama serve</code> ou ajuste o servidor na barra lateral.</p>
+            <p class="banner__hint" id="offline-hint" hidden></p>
+          </div>
+          <button class="btn btn--small" id="btn-retry-connection" type="button">Tentar novamente</button>
+        </div>
+
+        <form class="composer" id="composer" autocomplete="off">
+          <label class="sr-only" for="prompt">Sua mensagem</label>
+          <textarea id="prompt" rows="1" maxlength="8000" placeholder="Pergunte alguma coisa…"></textarea>
+          <div class="composer__foot">
+            <span class="composer__hint">Enter envia · Shift+Enter quebra linha</span>
+            <div class="composer__buttons">
+              <button class="btn btn--icon btn--send" id="btn-send" type="submit" aria-label="Enviar mensagem" title="Enviar">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
+              </button>
+              <button class="btn btn--icon btn--stop" id="btn-stop" type="button" aria-label="Parar resposta" title="Parar" hidden>
+                <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>
+              </button>
+            </div>
+          </div>
+        </form>
+        <p class="disclaimer">Respostas geradas por IA local podem conter erros. Verifique informações importantes.</p>
+      </footer>
+    </main>
+  </div>
+
+  <div class="bot" id="bot">
+    <section class="bot-panel" id="bot-panel" role="dialog" aria-modal="false" aria-label="Chat com o assistente Nexa" hidden>
+      <header class="bot-head">
+        <div class="bot-brand">
+          <span class="bot-brand__mark" aria-hidden="true">✦</span>
+          <div class="bot-brand__text">
+            <strong id="bot-title">Nexa</strong>
+            <span id="bot-subtitle">Assistente virtual</span>
+          </div>
+        </div>
+        <div class="bot-head__actions">
+          <span class="bot-status" id="bot-status" data-state="checking" role="img" aria-label="Verificando conexão com o Ollama">
+            <span class="bot-status__dot" aria-hidden="true"></span>
+          </span>
+          <button class="icon-btn" id="bot-clear" type="button" aria-label="Limpar conversa do bot" title="Limpar conversa">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+          </button>
+          <button class="icon-btn" id="bot-close" type="button" aria-label="Fechar chat" title="Fechar">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="bot-body">
+        <div class="bot-messages" id="bot-messages" role="log" aria-label="Mensagens do assistente"></div>
+
+        <div class="bot-empty" id="bot-empty">
+          <span class="bot-empty__mark" aria-hidden="true">✦</span>
+          <p class="bot-empty__greeting" id="bot-greeting"></p>
+          <div class="bot-suggestions" id="bot-suggestions"></div>
+        </div>
+      </div>
+
+      <div class="bot-banner" id="bot-banner" role="status" hidden>
+        <p><strong>Ollama offline.</strong> Não foi possível conectar a <code id="bot-banner-url">http://localhost:11434</code>. <span id="bot-banner-hint"></span></p>
+        <button class="btn btn--small" id="bot-retry" type="button">Verificar</button>
+      </div>
+
+      <div class="bot-composer">
+        <form class="composer" id="bot-form" autocomplete="off">
+          <label class="sr-only" for="bot-prompt">Sua mensagem para o assistente</label>
+          <textarea id="bot-prompt" rows="1" maxlength="8000" placeholder="Pergunte alguma coisa…"></textarea>
+          <div class="composer__foot">
+            <span class="composer__hint">Enter envia · Shift+Enter quebra linha</span>
+            <div class="composer__buttons">
+              <button class="btn btn--icon btn--send" id="bot-send" type="submit" aria-label="Enviar mensagem" title="Enviar">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
+              </button>
+              <button class="btn btn--icon btn--stop" id="bot-stop" type="button" aria-label="Parar resposta" title="Parar" hidden>
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <button class="bot-launcher" id="bot-launcher" type="button" aria-expanded="false" aria-controls="bot-panel" aria-label="Abrir chat do assistente Nexa">
+      <span class="bot-launcher__icon" aria-hidden="true">✦</span>
+      <span class="bot-launcher__badge" id="bot-badge" hidden></span>
+    </button>
+
+    <div class="sr-only" id="bot-sr" role="status" aria-live="polite"></div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="assertive" aria-atomic="false"></div>
+  <div class="sr-only" id="sr-status" role="status" aria-live="polite"></div>
+
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/widget.js"></script>
+</body>
+</html>
